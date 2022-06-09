@@ -3,8 +3,10 @@ package com.delorme.androidbasics.controleur;
 import static android.content.ContentValues.TAG;
 import static com.delorme.androidbasics.model.Utils.generateQuestionBank;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -24,7 +26,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     private Button mAnswerButton4;
     private QuestionBank mQuestionBank;
     private Question mCurrentQuestion;
-    private int mRemainingQuestionCount = 4;
+    private int mRemainingQuestionCount = 3;
     private int mScore = 0;
 
     @Override
@@ -39,7 +41,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         mAnswerButton4 = findViewById(R.id.game_activity_button_4);
 
         mQuestionBank = generateQuestionBank();
-        mCurrentQuestion = mQuestionBank.getNextQuestion();
+        mCurrentQuestion = mQuestionBank.getCurrentQuestion();
         displayQuestion(mCurrentQuestion);
         mAnswerButton1.setOnClickListener(this);
         mAnswerButton2.setOnClickListener(this);
@@ -86,6 +88,17 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
             displayQuestion(mCurrentQuestion);
         } else {
             // No question left, end the game
+            showDialog();
         }
+    }
+
+    private void showDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+        builder.setTitle("Well done!")
+                .setMessage("Your score is " + mScore)
+                .setPositiveButton("OK", (dialog, which) -> finish())
+                .create()
+                .show();
     }
 }

@@ -7,7 +7,7 @@ import java.util.List;
 public class QuestionBank {
 
     private List<Question> mQuestionList;
-    private int mNextQuestionIndex;
+    private int mQuestionIndex;
 
     public QuestionBank(List<Question> questionList) {
         // Shuffle the question list before storing it
@@ -15,10 +15,13 @@ public class QuestionBank {
         Collections.shuffle(mQuestionList);
     }
 
+    public Question getCurrentQuestion() {
+        return mQuestionList.get(mQuestionIndex);
+    }
+
     public Question getNextQuestion() {
-        // Loop over the questions and return a new one at each call
-        mNextQuestionIndex++;
-        return mQuestionList.get(mNextQuestionIndex);
+        mQuestionIndex++;
+        return getCurrentQuestion();
     }
 
 }
