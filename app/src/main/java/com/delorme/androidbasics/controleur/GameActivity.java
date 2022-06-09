@@ -3,13 +3,16 @@ package com.delorme.androidbasics.controleur;
 import static android.content.ContentValues.TAG;
 import static com.delorme.androidbasics.model.Utils.generateQuestionBank;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -21,6 +24,12 @@ import com.delorme.androidbasics.model.QuestionBank;
 
 public class GameActivity extends AppCompatActivity implements View.OnClickListener {
     public static final String BUNDLE_EXTRA_SCORE = "BUNDLE_EXTRA_SCORE";
+    public static final String BUNDLE_STATE_SCORE = "BUNDLE_STATE_SCORE";
+    public static final String BUNDLE_STATE_QUESTION = "BUNDLE_STATE_QUESTION";
+    private static final String BUNDLE_STATE_QUESTION_BANK = "BUNDLE_STATE_QUESTION_BANK";
+
+    private boolean mEnableTouchEvents = true;
+
 
     private TextView mQuestionTextView;
     private Button mAnswerButton1;
@@ -32,20 +41,37 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     private int mRemainingQuestionCount = 3;
     private int mScore = 0;
 
+
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent ev) {
+        return mEnableTouchEvents && super.dispatchTouchEvent(ev);
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
 
+        if (savedInstanceState != null) {
+            mScore = savedInstanceState.getInt(BUNDLE_STATE_SCORE);
+            mRemainingQuestionCount = savedInstanceState.getInt(BUNDLE_STATE_QUESTION);
+            mQuestionBank = savedInstanceState.getParcelable(BUNDLE_STATE_QUESTION_BANK);
+        } else {
+            mQuestionBank = generateQuestionBank();
+        }
+        setListeners();
+        mCurrentQuestion = mQuestionBank.getCurrentQuestion();
+        displayQuestion(mCurrentQuestion);
+
+
+    }
+
+    private void setListeners() {
         mQuestionTextView = findViewById(R.id.game_activity_textview_question);
         mAnswerButton1 = findViewById(R.id.game_activity_button_1);
         mAnswerButton2 = findViewById(R.id.game_activity_button_2);
         mAnswerButton3 = findViewById(R.id.game_activity_button_3);
         mAnswerButton4 = findViewById(R.id.game_activity_button_4);
-
-        mQuestionBank = generateQuestionBank();
-        mCurrentQuestion = mQuestionBank.getCurrentQuestion();
-        displayQuestion(mCurrentQuestion);
         mAnswerButton1.setOnClickListener(this);
         mAnswerButton2.setOnClickListener(this);
         mAnswerButton3.setOnClickListener(this);
@@ -76,22 +102,33 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         } else {
             throw new IllegalStateException("Unknown clicked view : " + v);
         }
-        Log.d(TAG, "onClick: "+index);
+        answerQuestion(index);
+        finishTurn();
+    }
+
+    private void finishTurn() {
+        mRemainingQuestionCount--;
+        mEnableTouchEvents = false;
+        new Handler().postDelayed(() -> {
+            // If this is the last question, ends the game.
+            // Else, display the next question.
+            if (mRemainingQuestionCount > 0) {
+                mCurrentQuestion = mQuestionBank.getNextQuestion();
+                displayQuestion(mCurrentQuestion);
+            } else {
+                // No question left, end the game
+                showDialog();
+            }
+            mEnableTouchEvents = true;
+        }, 2_000);
+    }
+
+    private void answerQuestion(int index) {
         if (mCurrentQuestion.getAnswerIndex() == index){
-            Log.d(TAG, "onClick: Bravo!!!" );
             Toast.makeText(this, "Bravo vous avez trouvez la bonne réponse", Toast.LENGTH_SHORT).show();
             mScore++;
         } else {
             Toast.makeText(this, "Désolé la bonne réponse était " + mCurrentQuestion.getChoiceList().get(mCurrentQuestion.getAnswerIndex()), Toast.LENGTH_SHORT).show();
-        }
-        mRemainingQuestionCount--;
-
-        if (mRemainingQuestionCount > 0) {
-            mCurrentQuestion = mQuestionBank.getNextQuestion();
-            displayQuestion(mCurrentQuestion);
-        } else {
-            // No question left, end the game
-            showDialog();
         }
     }
 
@@ -110,5 +147,12 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         intent.putExtra(BUNDLE_EXTRA_SCORE, mScore);
         setResult(RESULT_OK, intent);
         finish();
+    }
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelable(BUNDLE_STATE_QUESTION_BANK, mQuestionBank);
+        outState.putInt(BUNDLE_STATE_SCORE, mScore);
+        outState.putInt(BUNDLE_STATE_QUESTION, mRemainingQuestionCount);
     }
 }

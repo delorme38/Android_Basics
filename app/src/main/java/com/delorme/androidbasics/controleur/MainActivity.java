@@ -1,7 +1,7 @@
 package com.delorme.androidbasics.controleur;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
+
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -23,6 +23,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String SHARED_PREF_USER_INFO = "SHARED_PREF_USER_INFO";
     private static final String SHARED_PREF_USER_INFO_NAME = "SHARED_PREF_USER_INFO_NAME";
     private static final String SHARED_PREF_USER_INFO_SCORE = "SHARED_PREF_USER_INFO_SCORE";
+
 
     private TextView mGreetingTextView;
     private EditText mNameEditText;
@@ -90,6 +91,8 @@ public class MainActivity extends AppCompatActivity {
                 .apply();
     }
 
+
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -98,6 +101,7 @@ public class MainActivity extends AppCompatActivity {
             int score = data.getIntExtra(GameActivity.BUNDLE_EXTRA_SCORE, 0);
             mUser.setScore(score);
             saveToSharedPref();
+            playerCheck();
         }
 
     }
