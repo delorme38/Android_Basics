@@ -143,9 +143,11 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void endGame(){
-        Intent intent = new Intent();
-        intent.putExtra(BUNDLE_EXTRA_SCORE, mScore);
-        setResult(RESULT_OK, intent);
+//        Intent intent = new Intent();
+//        intent.putExtra(BUNDLE_EXTRA_SCORE, mScore);
+//        setResult(RESULT_OK, intent);
+//        finish();
+        setResult(RESULT_OK, getIntent().putExtra(BUNDLE_EXTRA_SCORE, mScore));
         finish();
     }
     @Override

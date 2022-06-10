@@ -39,4 +39,36 @@ public class Utils {
 
         return new QuestionBank(Arrays.asList(question1, question2, question3));
     }
+
+//    ActivityResultLauncher<Intent> detailActivity = registerForActivityResult(
+//            new ActivityResultContracts.StartActivityForResult(),
+//            new ActivityResultCallback<ActivityResult>() {
+//                @Override
+//                public void onActivityResult(ActivityResult result) {
+//                    if (result.getResultCode() == Activity.RESULT_OK) {
+//                        // There are no request codes
+//                        Intent data = result.getData();
+//                        if(data != null) {
+//                            if (data.hasExtra(AMENDEDETAILS)) {
+//                                Amende amende = (Amende) data.getParcelableExtra(AMENDEDETAILS);
+//                                CustomAdapter adapter = (CustomAdapter) binding.rvAmandes.getAdapter();
+//
+//                                if (selectedAmende != -1) {
+//                                    adapter.updateAmende(selectedAmende, amende);
+//                                } else {
+//                                    adapter.ajouterAmende(amende);
+//                                }
+//
+//                            }
+//                            if (data.hasExtra("actions")) {
+//                                if (data.getSerializableExtra("actions") == Actions.Delete) {
+//                                    ((CustomAdapter) Objects.requireNonNull(binding.rvAmandes.getAdapter())).supprimeAmendeSelectionner(selectedAmende);
+//
+//                                }
+//                            }
+//                        }
+//                        selectedAmende = -1;
+//                    }
+//                }
+//            });
 }
